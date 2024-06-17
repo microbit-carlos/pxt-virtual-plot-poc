@@ -1,6 +1,6 @@
 {
     "editor.formatOnType": true,
-    "files.autoSave": "afterDelay",
+    "files.autoSave": "off",
     "files.watcherExclude": {
         "**/.git/objects/**": true,
         "**/built/**": true,
@@ -25,5 +25,11 @@
     "files.exclude": {
         "**/pxt_modules": true,
         "**/.pxt": true
+    },
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false
     }
 }

@@ -2,23 +2,24 @@
     "name": "virtual-plot-poc",
     "version": "0.0.0",
     "description": "An experiment",
+    "license": "MIT",
     "dependencies": {
         "core": "*",
         "radio": "*",
+        "datalogger": "*",
         "microphone": "*"
     },
     "files": [
         "README.md",
-        "main.blocks",
-        "main.ts"
+        "extension.ts"
     ],
     "testFiles": [
-        "test.ts"
+        "main.blocks",
+        "main.ts"
     ],
     "public": true,
     "supportedTargets": [
         "microbit"
     ],
-    "preferredEditor": "blocksprj",
-    "license": "MIT"
+    "preferredEditor": "tsprj"
 }

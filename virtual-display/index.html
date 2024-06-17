@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html data-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>micro:bit - Virtual Plotter</title>
+    <!--script src="https://cdn.jsdelivr.net/npm/chart.js@3.3.2"></script-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@1.27.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@2.0.0"></script>
+    
+    <!--link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.0.6/css/pico.min.css" -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 12px;
+        }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 12px;
+            color: white;
+            border-radius: 8px;
+        }
+        .top-bar img {
+            height: 30px;
+        }
+        .top-bar button {
+            background-color: #444;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .top-bar button:hover {
+            background-color: #555;
+        }
+        .chart-container {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <img src="data:image/svg+xml,%3c?xml%20version=%271.0%27%20encoding=%27utf-8%27?%3e%3c!--%20Generator:%20Adobe%20Illustrator%2020.1.0,%20SVG%20Export%20Plug-In%20.%20SVG%20Version:%206.00%20Build%200)%20--%3e%3csvg%20version=%271.1%27%20id=%27Layer_1%27%20xmlns=%27http://www.w3.org/2000/svg%27%20xmlns:xlink=%27http://www.w3.org/1999/xlink%27%20x=%270px%27%20y=%270px%27%20viewBox=%270%200%20166.8%2028.7%27%20style=%27enable-background:new%200%200%20166.8%2028.7;%27%20xml:space=%27preserve%27%3e%3cg%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M71.7,23.1h-3.3V14c0-2-1.2-3.5-2.8-3.5c-1.6,0-2.8,1.4-2.8,3.5v9.1h-3.3V14c0-2.3-1.4-3.5-2.8-3.5%20c-1.6,0-2.8,1.4-2.8,3.5v9.1h-3.3v-9c0-4.1,2.5-6.9,6.1-6.9c1.7,0,3.1,0.7,4.4,2.1c1.2-1.4,2.7-2.1,4.5-2.1c3.6,0,6,2.9,6,6.9%20V23.1z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M77.7,23.1h-3.3V7.6h3.3V23.1z%20M76,5.3c-1.2,0-2.1-0.9-2.1-2.1c0-1.2,0.9-2.1,2.1-2.1c1.2,0,2.1,0.9,2.1,2.1%20C78.2,4.4,77.2,5.3,76,5.3z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M88.1,23.5c-2.1,0-4.2-0.9-5.7-2.4c-1.5-1.5-2.3-3.5-2.3-5.8c0-2.2,0.8-4.3,2.3-5.8C84,8.1,86,7.2,88.1,7.2%20c2.3,0,4.3,0.8,5.8,2.3l0.4,0.4L92,12.3l-0.4-0.4c-1.1-1-2.2-1.5-3.4-1.5c-2.6,0-4.8,2.2-4.8,4.9c0,2.7,2.1,4.9,4.8,4.9%20c1.2,0,2.3-0.5,3.4-1.4l0.4-0.4l2.4,2.3l-0.5,0.4C92.1,22.7,90.2,23.5,88.1,23.5z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M100.1,23.1h-3.5v-7.8c0-5,2.2-7.4,7-7.8l0.7-0.1v3.3l-0.5,0.1c-2.6,0.3-3.6,1.5-3.6,4.3V23.1z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M113.4,23.5c-2.1,0-4.2-0.9-5.7-2.4c-1.5-1.5-2.3-3.6-2.3-5.8c0-2.2,0.8-4.2,2.3-5.8c1.5-1.6,3.5-2.4,5.7-2.4%20c2.1,0,4.1,0.9,5.6,2.4c1.5,1.5,2.3,3.6,2.3,5.8c0,2.2-0.8,4.3-2.3,5.8C117.5,22.7,115.5,23.5,113.4,23.5z%20M113.3,10.5%20c-2.5,0-4.6,2.2-4.6,4.9c0,2.7,2.1,4.9,4.6,4.9c2.6,0,4.6-2.1,4.6-4.9C118,12.6,115.9,10.5,113.3,10.5z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M126.8,23.1c-1.2,0-2.3-1-2.3-2.3c0-1.3,1-2.3,2.3-2.3c1.3,0,2.3,1,2.3,2.3C129,22.1,128,23.1,126.8,23.1z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M126.8,11.7c-1.2,0-2.3-1-2.3-2.3c0-1.3,1-2.3,2.3-2.3c1.3,0,2.3,1,2.3,2.3C129,10.7,128,11.7,126.8,11.7z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M140.2,23.5c-4.7,0-8-3.7-8-8.9c0-0.3,0-0.7,0-1l0-13.4h3.3v8.5c1.4-1,3-1.5,4.7-1.5c2.1,0,4.1,0.8,5.6,2.4%20c1.5,1.5,2.3,3.6,2.3,5.8c0,2.2-0.8,4.3-2.3,5.8C144.3,22.7,142.3,23.5,140.2,23.5z%20M140.2,10.5c-2.6,0-4.8,2.2-4.8,4.9%20c0,2.7,2.1,4.9,4.8,4.9c2.6,0,4.8-2.2,4.8-4.9C144.9,12.7,142.8,10.5,140.2,10.5z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M154.3,23.1H151V7.6h3.3V23.1z%20M152.6,5.3c-1.2,0-2.1-0.9-2.1-2.1c0-1.2,0.9-2.1,2.1-2.1%20c1.2,0,2.1,0.9,2.1,2.1C154.8,4.4,153.8,5.3,152.6,5.3z%27/%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M166.6,23.6l-0.7-0.1c-4.9-0.9-6.7-3.3-6.7-8.6v-3.9h-1.4V7.8h1.4V4.3h3.3v3.4h4.1v3.2h-4.1v4.4%20c0,2.9,1.1,4.4,3.6,4.7l0.5,0.1V23.6z%27/%3e%3c/g%3e%3c/g%3e%3cg%3e%3cpath%20fill=%27%23fff%27%20d=%27M32.5,18c1.5,0,2.6-1.2,2.6-2.6s-1.2-2.6-2.6-2.6c-1.5,0-2.6,1.2-2.6,2.6S31.1,18,32.5,18%27/%3e%3cpath%20fill=%27%23fff%27%20d=%27M13.3,12.8c-1.5,0-2.6,1.2-2.6,2.6s1.2,2.6,2.6,2.6c1.4,0,2.6-1.2,2.6-2.6S14.7,12.8,13.3,12.8%27/%3e%3cpath%20fill=%27%23fff%27%20d=%27M13.3,7.6c-4.3,0-7.8,3.5-7.8,7.8c0,4.3,3.5,7.8,7.8,7.8h19.5c4.3,0,7.8-3.5,7.8-7.8c0-4.3-3.5-7.8-7.8-7.8%20H13.3%20M32.8,28.4H13.3c-7.2,0-13-5.8-13-13s5.8-13,13-13h19.5c7.2,0,13,5.8,13,13S39.9,28.4,32.8,28.4%27/%3e%3c/g%3e%3c/svg%3e" alt="Logo">
+        <div><span> Virtual plotter</span></div>
+        <div>
+            <button id="buttonSerial">Connect to Serial</button>
+            <button id="buttonBluetooth">Connect to Bluetooth</button>
+        </div>
+    </div>
+    <div class="chart-container">
+        <canvas id="myChart" width="400" height="200"></canvas>
+    </div>
+
+    <script>
+        ///////////////////////////////////////////////////////////////////////
+        // Chart.js setup
+        ///////////////////////////////////////////////////////////////////////
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const data = {
+            datasets: []
+        };
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                scales: {
+                    x: {
+                        type: 'realtime',
+                        realtime: {
+                            duration: 10000,
+                            refresh: 100,
+                            delay: 1000,
+                            onRefresh: function(chart) {
+                                // Nothing here, We manually update the data from serial
+                            }
+                        }
+                    },
+                    y: {
+                        display: true,
+                        text: 'Y axis'
+                    },
+                },
+                interaction: {
+                    intersect: false
+                }
+            }
+        };
+        Chart.register(ChartStreaming);
+        const myChart = new Chart(ctx, config);
+
+        const addNewDataset = (label) => {
+            const newDataset= {
+                label: label,
+                data: [],
+                backgroundColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.2)`,
+                borderColor: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 1)`,
+                //cubicInterpolationMode: 'monotone',
+            };
+            data.datasets.push(newDataset);
+            return newDataset;
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // Charting actions
+        ///////////////////////////////////////////////////////////////////////
+        let timeStamps = {};
+        const messageActions = {
+            'ChartType': (value) => {
+                console.log('ChartType:', value);
+            },
+            'Labels': (value) => {
+                console.log('Labels:', value);
+            },
+            'Set': (label, value) => {
+                console.log('Set:', label, value);
+            },
+            'Add': (timestamp, label, value) => {
+                const parsedValue = parseInt(value);
+                if (isNaN(parsedValue)) {
+                    console.error('Invalid value:', value);
+                    return;
+                }
+                const foundDataset = findDataset(label);
+
+                if (!timeStamps[timestamp]) {
+                    timeStamps[timestamp] = new Date().toLocaleTimeString();
+                    myChart.update();
+                }
+                const t = timeStamps[timestamp];
+                foundDataset.data.push({
+                    x: t,
+                    y: parsedValue,
+                });
+            },
+            'Inc': (label, value) => {
+                console.log('Inc:', label, value);
+            },
+            'Dec': (label, value) => {
+                console.log('Dec:', label, value);
+            },
+        }
+
+        const findDataset = (label) => {
+            let foundDataset = data.datasets.find(dataset => dataset.label === label);
+            if (foundDataset) {
+                return foundDataset;
+            }
+            return addNewDataset(label);
+        };
+
+        ///////////////////////////////////////////////////////////////////////
+        // Message handling
+        ///////////////////////////////////////////////////////////////////////
+        function parseMessage(line) {
+            // Message for with format :command:value
+            if (line.startsWith(':')) {
+                let parsedMsg = line.substring(1).split(':');
+                if (parsedMsg.length > 4) {
+                    console.error('Message invalid:', line);
+                }
+                const cmd = parsedMsg[0].trim();
+                if (messageActions[cmd]) {
+                    // console.log('Message:', parsedMsg);
+                    messageActions[cmd](
+                        parsedMsg[1].trim(),
+                        parsedMsg[2].trim(),
+                        parsedMsg[3].trim()
+                    );
+                } else {
+                    console.error('Message invalid:', parsedMsg);
+                }
+            } else {
+                console.error('Message invalid:', line);
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        // Web Serial
+        ///////////////////////////////////////////////////////////////////////
+        let port;
+        let reader;
+        let readableStreamClosed;
+        let serialEnabled = false;
+        async function connectSerial() {
+            if (serialEnabled) return;
+
+            try {
+                port = await navigator.serial.requestPort({
+                    filters: [
+                        { usbVendorId: 0x0d28, usbProductId: 0x0204 }
+                    ]
+                });
+                await port.open({
+                    baudRate: 115200
+                });
+                const textDecoder = new TextDecoderStream();
+                readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+                reader = textDecoder.readable.getReader();
+
+                serialEnabled = true;
+            } catch (error) {
+                console.error('Error connecting to serial port:', error);
+            }
+            document.getElementById('buttonSerial').textContent = 'Disconnect from Serial';
+            serialLoop();
+        }
+
+        async function serialLoop() {
+            let buffer = '';
+            try {
+                while (serialEnabled) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        reader.releaseLock();
+                        break;
+                    }
+                    buffer += value;
+                    let lines = buffer.split(/\r\n|\r|\n/);
+                    buffer = lines.pop();
+                    for (let line of lines) {
+                        // console.log('Serial line:', line, line.length, new TextEncoder('ascii').encode(line));
+                        try {
+                            parseMessage(line);
+                        } catch (error) {
+                            console.error('Error parsing serial line:', line, error);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error reading from serial port:', error);
+                disconnectSerial();
+            }
+        }
+
+        async function disconnectSerial() {
+            try {
+                serialEnabled = false;
+                await reader.cancel();
+                await readableStreamClosed.catch(() => {});
+                await port.close();
+
+                document.getElementById('buttonSerial').textContent = 'Connect to Serial';
+            } catch (error) {
+                console.error('Error disconnecting from serial port:', error);
+            }
+        }
+
+        document.getElementById('buttonBluetooth').addEventListener('click', () => alert('Feature not yet implemented'));
+        document.getElementById('buttonSerial').addEventListener('click', async () => {
+            if (!serialEnabled) {
+                connectSerial();
+            } else {
+                disconnectSerial();
+            }
+        });
+    </script>
+</body>
+</html>
